@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_BASE_URL: http://backend:3000/api/v1 
+    ports:
+      - '3000:80'
+    environment:
+      VITE_BASE_URL: http://backend:3000/api/v1 
+    depends_on:
+      - backend
+    restart: always
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: development
+        JWT_SECRET: NtBoLwqgqPdFtlKDzpQU8dNwFSt1FRG7Rju3CRnzm5k=
+        PORT: 3000
+        DATABASE_URI: mongodb://mongo:27017/easy-generator-db
+        JWT_EXPIRES_IN: 3600s
+    ports:
+      - '3001:3000' 
+    environment:
+      NODE_ENV: development
+      JWT_SECRET: NtBoLwqgqPdFtlKDzpQU8dNwFSt1FRG7Rju3CRnzm5k=
+      PORT: 3000
+      DATABASE_URI: mongodb://mongo:27017/easy-generator-db
+      JWT_EXPIRES_IN: 3600s
+    depends_on:
+      - mongo
+    restart: always
+
+  mongo:
+    image: mongo:5
+    ports:
+      - '27017:27017' # Expose MongoDB port
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+
+volumes:
+  mongo-data:
+    driver: local

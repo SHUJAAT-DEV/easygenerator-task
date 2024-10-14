@@ -1,0 +1,26 @@
+FROM node:alpine
+WORKDIR /usr/src/app
+
+COPY package.json package-lock.json ./
+RUN yarn install
+
+COPY . .
+
+# Set environment variables
+ARG NODE_ENV
+ARG JWT_SECRET
+ARG PORT
+ARG DATABASE_URI
+ARG JWT_EXPIRES_IN
+ENV NODE_ENV=$NODE_ENV
+ENV JWT_SECRET=$JWT_SECRET
+ENV PORT=$PORT
+ENV DATABASE_URI=$DATABASE_URI
+ENV JWT_EXPIRES_IN=$JWT_EXPIRES_IN
+
+RUN yarn run build
+
+EXPOSE 3000
+
+# Start the NestJS application
+CMD ["npm", "run", "start:prod"]
